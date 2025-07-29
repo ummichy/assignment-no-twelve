@@ -533,12 +533,38 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+const admin = require("firebase-admin");
+const serviceAccount = require("./firebase-admin-service-key.json");
 
 // Collections
 let usersCollection;
 let donationsCollection;
 let blogsCollection; //new
 
+/ new added
+const verifyFireBaseToken = async (req, res, next) => {
+  const authHeader = req.headers?.authorization;
+
+
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).send({ message: 'unauthorized access' })
+  }
+
+  const token = authHeader.split(' ')[1];
+
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    console.log('decoded token', decoded);
+    req.decoded = decoded;
+    next();
+
+  }
+  catch (error) {
+    return res.status(401).send({ message: 'unauthorized access' })
+  }
+
+
+}
 
 // Main MongoDB connection function
 async function run() {
