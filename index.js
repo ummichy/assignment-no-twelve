@@ -590,7 +590,20 @@ app.get('/', (req, res) => {
 // ------------------- USER ROUTES ------------------- //
 
 // Create a user
+app.post('/users', async (req, res) => {
+  const userData = req.body;
 
+  const existing = await usersCollection.findOne({ email: userData.email });
+  if (existing) {
+    return res.status(409).json({ message: "User already exists" });
+  }
+
+  userData.role = userData.role || "donor";
+  userData.status = userData.status || "active";
+
+  const result = await usersCollection.insertOne(userData);
+  res.status(201).json(result);
+});
 
 // Get a user by email
 app.get('/users/:email', async (req, res) => {
@@ -655,17 +668,10 @@ app.post('/donations', async (req, res) => {
   }
 });
 
-// Get donations by user email
-app.get('/donations/user/:email', async (req, res) => {
-  try {
-    const email = req.params.email;
-    const donations = await donationsCollection.find({ requesterEmail: email }).sort({ createdAt: -1 }).toArray();
-    res.json(donations);
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Failed to fetch donations" });
-  }
-});
+
+
+
+
 
 // Get donation by ID
 app.get('/donations/:id', async (req, res) => {
