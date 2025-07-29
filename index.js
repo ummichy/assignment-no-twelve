@@ -739,21 +739,20 @@ app.put('/donations/:id', async (req, res) => {
 
 //blogs new
 
+app.post('/blogs', async (req, res) => {
+  try {
+    const blogData = req.body;
 
+    blogData.status = "draft"; // default status
+    blogData.createdAt = new Date();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    const result = await blogsCollection.insertOne(blogData);
+    res.status(201).json(result);
+  } catch (error) {
+    console.error("❌ Error creating blog:", error);
+    res.status(500).json({ message: "Failed to create blog" });
+  }
+});
 
 
 
