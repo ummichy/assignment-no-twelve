@@ -669,7 +669,17 @@ app.post('/donations', async (req, res) => {
 });
 
 
-
+// Get donations by user email
+app.get('/donations/user/:email', async (req, res) => {
+  try {
+    const email = req.params.email;
+    const donations = await donationsCollection.find({ requesterEmail: email }).sort({ createdAt: -1 }).toArray();
+    res.json(donations);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to fetch donations" });
+  }
+});
 
 
 
