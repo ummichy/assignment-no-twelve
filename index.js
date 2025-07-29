@@ -25,6 +25,7 @@ async function run() {
     await client.connect();
 
 const donateCollection = client.db('donateDB').collection('donate');
+ const userCollection = client.db('donateDB').collection('users');
 
 app.get('/donate', async (req, res) => {
   const cursor = donateCollection.find();
@@ -32,6 +33,26 @@ app.get('/donate', async (req, res) => {
     res.send(result);
   } 
 );
+
+app.post("/add-user", async (req, res) => {
+  const userData = req.body;
+  const find_result = await userCollection.findOne({
+    email: userData.email,
+  });
+  if (find_result) {
+     userCollection.updateOne(
+          { email: userData.email },
+          {
+            $inc: { loginCount: 1 },
+          }
+        );
+    res.send({ msg: "user already exist" });
+  } else {
+    const result = await userCollection.insertOne(userData);
+    res.send(result);
+  }
+});
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
@@ -46,7 +67,7 @@ run().catch(console.dir);
 
 // Default route
 app.get('/', (req, res) => {
-  res.send('ServiceTrack server is running!');
+  res.send({msg : "hello"});
 });
 
 // Start server
