@@ -452,6 +452,23 @@ async function run() {
       res.send(donation);
     });
 
+
+    // GET user by email
+app.get('/users/:email', async (req, res) => {
+  const result = await userCollection.findOne({ email: req.params.email });
+  res.send(result);
+});
+
+// PUT update profile
+app.put('/users/:email', async (req, res) => {
+  const updated = req.body;
+  const result = await userCollection.updateOne(
+    { email: req.params.email },
+    { $set: updated }
+  );
+  res.send(result);
+});
+
     // Ping check
     await client.db("admin").command({ ping: 1 });
     console.log("✅ Server ready");
