@@ -590,20 +590,7 @@ app.get('/', (req, res) => {
 // ------------------- USER ROUTES ------------------- //
 
 // Create a user
-app.post('/users', async (req, res) => {
-  const userData = req.body;
 
-  const existing = await usersCollection.findOne({ email: userData.email });
-  if (existing) {
-    return res.status(409).json({ message: "User already exists" });
-  }
-
-  userData.role = userData.role || "donor";
-  userData.status = userData.status || "active";
-
-  const result = await usersCollection.insertOne(userData);
-  res.status(201).json(result);
-});
 
 // Get a user by email
 app.get('/users/:email', async (req, res) => {
